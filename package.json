@@ -24,6 +24,7 @@
     "semantic-release": "semantic-release",
     "commit": "git-cz"
   },
+  "precommit": ["build"],
   "repository": {
     "type": "git",
     "url": "https://github.com/sagalbot/vue-select.git"
