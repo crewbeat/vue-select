@@ -665,15 +665,6 @@ export default {
       type: [String, Number],
       default: () => uniqueId(),
     },
-
-    /**
-     * Collapse Tags in multiple mode
-     * @type {Boolean}
-     */
-    collapseTags: {
-      type: Boolean,
-      default: false,
-    }
   },
 
   data() {
