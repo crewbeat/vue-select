@@ -24,7 +24,9 @@
     "semantic-release": "semantic-release",
     "commit": "git-cz"
   },
-  "precommit": ["build"],
+  "precommit": [
+    "build"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/crewbeat/vue-select.git"

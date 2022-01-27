@@ -16,35 +16,51 @@
       @mousedown="toggleDropdown($event)"
     >
       <div ref="selectedOptions" class="vs__selected-options">
-        <slot
-          v-for="option in selectedValue"
-          name="selected-option-container"
-          :option="normalizeOptionForSlot(option)"
-          :deselect="deselect"
-          :multiple="multiple"
-          :disabled="disabled"
+        <div
+          v-if="multiple && collapseTags && selectedValue.length > 1"
+          class="vs__selected vs__collapse-tags"
         >
-          <span :key="getOptionKey(option)" class="vs__selected">
-            <slot
-              name="selected-option"
-              v-bind="normalizeOptionForSlot(option)"
-            >
-              {{ getOptionLabel(option) }}
-            </slot>
-            <button
-              v-if="multiple"
-              ref="deselectButtons"
-              :disabled="disabled"
-              type="button"
-              class="vs__deselect"
-              :title="`Deselect ${getOptionLabel(option)}`"
-              :aria-label="`Deselect ${getOptionLabel(option)}`"
-              @click="deselect(option)"
-            >
-              <component :is="childComponents.Deselect" />
-            </button>
-          </span>
-        </slot>
+          {{ collapseTags.concat(selectedValue.length.toString()) }}
+          <button
+            :disabled="disabled"
+            type="button"
+            class="vs__deselect"
+            @click="clearSelection"
+          >
+            <component :is="childComponents.Deselect" />
+          </button>
+        </div>
+        <template v-else>
+          <slot
+            v-for="option in selectedValue"
+            name="selected-option-container"
+            :option="normalizeOptionForSlot(option)"
+            :deselect="deselect"
+            :multiple="multiple"
+            :disabled="disabled"
+          >
+            <span :key="getOptionKey(option)" class="vs__selected">
+              <slot
+                name="selected-option"
+                v-bind="normalizeOptionForSlot(option)"
+              >
+                {{ getOptionLabel(option) }}
+              </slot>
+              <button
+                v-if="multiple"
+                ref="deselectButtons"
+                :disabled="disabled"
+                type="button"
+                class="vs__deselect"
+                :title="`Deselect ${getOptionLabel(option)}`"
+                :aria-label="`Deselect ${getOptionLabel(option)}`"
+                @click="deselect(option)"
+              >
+                <component :is="childComponents.Deselect" />
+              </button>
+            </span>
+          </slot>
+        </template>
 
         <slot name="search" v-bind="scope.search">
           <input
@@ -110,6 +126,8 @@
             'vs__dropdown-option--disabled': !selectable(option),
           }"
           :aria-selected="index === typeAheadPointer ? true : null"
+          :title="getOptionLabel(option)"
+          :aria-label="getOptionLabel(option)"
           @mouseover="selectable(option) ? (typeAheadPointer = index) : null"
           @click.prevent.stop="selectable(option) ? select(option) : null"
         >
@@ -665,6 +683,13 @@ export default {
       type: [String, Number],
       default: () => uniqueId(),
     },
+    /**
+     * Used to not show all selected items when multiple is enabled
+     * @type {String}
+     */
+    collapseTags: {
+      type: String,
+    },
   },
 
   data() {
@@ -1018,7 +1043,6 @@ export default {
       )
       this.$emit('option:deselected', option)
     },
-
     /**
      * Clears the currently selected value(s)
      * @return {void}
